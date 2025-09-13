@@ -79,10 +79,68 @@ void fft_inverse(complex t[], complex s[], int n) {
     normalize(s, n);
 }
 
-void fft_forward_2d(complex matrix[MAX_SIZE][MAX_SIZE], int width, int height) {
+void fft_forward_2d(complex matrix[MAX_SIZE][MAX_SIZE], int width, int height){
+    complex vet_entrada[MAX_SIZE];
+    complex vet_saida[MAX_SIZE];
+
+    for(int y = 0; y < height; y++){ // copia a linha y p/ vetor de entrada (colunas da linha y)
+
+        for(int x = 0; x < width; x++){ 
+            vet_entrada[x] = matrix[y][x];
+        }
+
+        fft_forward(vet_entrada, vet_saida, width); //faz a soma exponencial
+        
+        for(int x = 0; x < width; x++){ //copia a saida de volta pra linha y
+            matrix[y][x] = vet_saida[x];
+        } 
+    }
+
+
+    for(int x = 0; x < width; x++){// copia a coluna x p/ vetor de entrada (linhas da coluna x)
+
+        for(int y = 0; y < height; y++){
+            vet_entrada[y] = matrix[y][x];
+        } 
+        
+        fft_forward(vet_entrada, vet_saida, height);// faz a soma exponencial
+        
+        for(int y = 0; y < height; y++){//copia a saida de volta pra coluna x
+            matrix[y][x] = vet_saida[y];
+        } 
+    }
 }
 
-void fft_inverse_2d(complex matrix[MAX_SIZE][MAX_SIZE], int width, int height) {
+void fft_inverse_2d(complex matrix[MAX_SIZE][MAX_SIZE], int width, int height){
+    complex vet_entrada[MAX_SIZE];
+    complex vet_saida[MAX_SIZE];
+    
+    for(int x = 0; x < width; x++){ //copia a coluna x p/ vetor de entrada (linhas da coluna x)
+    
+        for(int y = 0; y < height; y++){
+            vet_entrada[y] = matrix[y][x];  
+        } 
+    
+        fft_inverse(vet_entrada, vet_saida, height);//faz a fourier inversa da coluna e normaliza pela altura
+    
+        for(int y = 0; y < height; y++){//copia a saida de volta pra coluna x
+            matrix[y][x] = vet_saida[y];
+        } 
+    }
+
+    for(int y = 0; y < height; y++){// copia a linha y p/ vetor de entrada (colunas da linha y)
+    
+        for(int x = 0; x < width; x++){
+            vet_entrada[x] = matrix[y][x];
+    
+        } 
+    
+        fft_inverse(vet_entrada, vet_saida, width);//faz a fourier inversa da linha  e normaliza pela largura
+    
+        for(int x = 0; x < width; x++){//copia a saida de volta pra linha y
+            matrix[y][x] = vet_saida[x];
+        } 
+    }
 }
 
 void filter(complex input[MAX_SIZE][MAX_SIZE], complex output[MAX_SIZE][MAX_SIZE], int width, int height, int flip) {
